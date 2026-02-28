@@ -10,6 +10,12 @@ import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
+    /**
+     * Finds all reservations that overlap with the given time interval
+     * @param startTime start of the requested interval (inclusive)
+     * @param endTime   end of the requested interval (exclusive)
+     * @return list of reservations that overlap with the given interval
+     */
     @Query("""
         select r
         from Reservation r
