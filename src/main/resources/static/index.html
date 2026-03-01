@@ -88,7 +88,20 @@
         </aside>
     </section>
 </div>
+<!-- Confirm modal -->
+<div id="confirmOverlay" class="modal-overlay" hidden>
+    <div class="modal">
+        <div class="modal-title">Create reservation?</div>
+        <div id="confirmBody" class="modal-body"></div>
+        <div class="modal-actions">
+            <button class="secondary" id="confirmCancel">Cancel</button>
+            <button id="confirmOk">OK</button>
+        </div>
+    </div>
+</div>
 
+<!-- Toast / message -->
+<div id="toast" class="toast" hidden></div>
 <script src="app.js"></script>
 </body>
 </html>

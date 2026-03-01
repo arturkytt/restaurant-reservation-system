@@ -13,6 +13,13 @@ const recommendBtn = document.getElementById("recommendBtn");
 const recommendationBox = document.getElementById("recommendationBox");
 const topCandidates = document.getElementById("topCandidates");
 
+const confirmOverlay = document.getElementById("confirmOverlay");
+const confirmBody = document.getElementById("confirmBody");
+const confirmOk = document.getElementById("confirmOk");
+const confirmCancel = document.getElementById("confirmCancel");
+
+const toast = document.getElementById("toast");
+
 let tables = [];
 let availability = [];
 let recommendedId = null;
@@ -37,6 +44,19 @@ async function fetchJson(url) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     return res.json();
+}
+
+async function postJson(url, body) {
+    const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        throw new Error(text || `${res.status} ${res.statusText}`);
+    }
 }
 
 function buildAvailabilityUrl() {
@@ -115,6 +135,18 @@ function renderFloor() {
       <div class="meta">${features || "—"}</div>
     `;
 
+        // click-to-reserve only if free and suitable
+        if (!occupied && suitable) {
+            tile.style.cursor = "pointer";
+            tile.addEventListener("click", async () => {
+                try {
+                    await reserveTable(t.id);
+                } catch (e) {
+                    alert(`Reservation failed: ${e.message}`);
+                }
+            });
+        }
+
         floorGrid.appendChild(tile);
     });
 
@@ -183,8 +215,78 @@ async function recommend() {
         recommendationBox.innerHTML = `<div class="muted">${e.message}</div>`;
     }
 }
+function showToast(message, type = "success") {
+    toast.textContent = message;
+    toast.className = `toast ${type}`;
+    toast.hidden = false;
+    setTimeout(() => (toast.hidden = true), 2200);
+}
+
+function openConfirm(message) {
+    return new Promise(resolve => {
+        confirmBody.textContent = message;
+        confirmOverlay.hidden = false;
+
+        const cleanup = (result) => {
+            confirmOverlay.hidden = true;
+            confirmOk.removeEventListener("click", onOk);
+            confirmCancel.removeEventListener("click", onCancel);
+            confirmOverlay.removeEventListener("click", onOverlay);
+            document.removeEventListener("keydown", onKey);
+            resolve(result);
+        };
+
+        const onOk = () => cleanup(true);
+        const onCancel = () => cleanup(false);
+
+        const onOverlay = (e) => {
+            if (e.target === confirmOverlay) cleanup(false);
+        };
+
+        // ESC
+        const onKey = (e) => {
+            if (e.key === "Escape") cleanup(false);
+        };
+
+        confirmOk.addEventListener("click", onOk);
+        confirmCancel.addEventListener("click", onCancel);
+        confirmOverlay.addEventListener("click", onOverlay);
+        document.addEventListener("keydown", onKey);
+    });
+}
+
+async function reserveTable(tableId) {
+    const date = dateInput.value;
+    const time = timeInput.value;
+    const partySize = Number(partySizeInput.value);
+
+    //const ok = confirm(`Create reservation?\nTable ID: ${tableId}\n${date} ${time}\nParty size: ${partySize}`);
+    const ok = await openConfirm(
+        `Table ID: ${tableId}\n${date} ${time}\nParty size: ${partySize}`
+    );
+    if (!ok) return;
+
+    try {
+        await postJson("/api/reservations", {
+            tableId,
+            date,
+            time,
+            partySize
+        });
+        showToast("Reservation created", "success");
+        recommendedId = null;
+        await refreshAll();
+    } catch (e) {
+        showToast("Reservation failed", "error");
+        console.error(e);
+    }
+}
+
 
 function init() {
+    confirmOverlay.hidden = true;
+    toast.hidden = true;
+
     dateInput.value = todayISO();
     timeInput.value = defaultTime();
 
@@ -201,5 +303,4 @@ function init() {
 
     refreshAll();
 }
-
 init();
