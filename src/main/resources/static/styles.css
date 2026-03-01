@@ -108,7 +108,7 @@ button {
     border-color: rgba(17, 24, 39, .15);
 }
 
-button:hover { opacity: .95; }
+button:hover { opacity: .8; }
 
 button.secondary {
     background: #fff;
