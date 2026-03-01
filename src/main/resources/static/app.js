@@ -142,7 +142,7 @@ function renderFloor() {
                 try {
                     await reserveTable(t.id);
                 } catch (e) {
-                    alert(`Reservation failed: ${e.message}`);
+                    showToast(`Reservation failed: ${e.message}`, "error");
                 }
             });
         }
