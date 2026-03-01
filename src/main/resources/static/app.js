@@ -102,7 +102,7 @@ function renderFloor() {
         if (occupied) tile.classList.add("occupied");
         else tile.classList.add("free");
 
-        if (!suitable) tile.classList.add("unsuitable");
+        if (!occupied && !suitable) tile.classList.add("unsuitable");
         if (recommendedId && t.id === recommendedId) tile.classList.add("recommended");
 
         const features = (t.features || []).join(", ");
@@ -136,7 +136,7 @@ function renderRecommendation(resp) {
     recommendedId = r.id;
 
     recommendationBox.innerHTML = `
-    <div><strong>${r.code}</strong> <span class="kv">(displayZone(${r.zone}))</span></div>
+    <div><strong>${r.code}</strong> <span class="kv">(${displayZone(r.zone)})</span></div>
     <div class="muted">capacity: ${r.capacity} · score: <span class="score">${r.score}</span></div>
     <div class="muted">features: ${(r.features || []).join(", ") || "—"}</div>
   `;
@@ -194,6 +194,8 @@ function init() {
     });
 
     recommendBtn.addEventListener("click", async () => {
+        recommendedId = null;
+        await refreshAll();
         await recommend();
     });
 
