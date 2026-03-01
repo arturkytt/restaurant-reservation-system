@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Restaurant Reservation System</title>
+    <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+<div class="app">
+    <header class="header">
+        <div>
+            <h1>Restaurant Floor Plan</h1>
+            <p class="muted">Availability + Recommendation</p>
+        </div>
+        <div class="badge" id="statusBadge">Disconnected</div>
+    </header>
+
+    <section class="panel">
+        <div class="grid">
+            <label>
+                Date
+                <input id="dateInput" type="date"/>
+            </label>
+
+            <label>
+                Time (HH:mm)
+                <input id="timeInput" type="time" step="900"/>
+            </label>
+
+            <label>
+                Party size
+                <input id="partySizeInput" type="number" min="1" value="4"/>
+            </label>
+
+            <label>
+                Zone
+                <select id="zoneSelect">
+                    <option value="">All</option>
+                    <option value="MAIN_HALL">MAIN</option>
+                    <option value="TERRACE">TERRACE</option>
+                    <option value="PRIVATE_ROOM">PRIVATE</option>
+                </select>
+            </label>
+
+            <div>
+                <div class="label-title">Features</div>
+                <div class="checks">
+                    <label class="check"><input type="checkbox" value="WINDOW" /> Near window</label>
+                    <label class="check"><input type="checkbox" value="QUIET" /> Quiet</label>
+                    <label class="check"><input type="checkbox" value="ACCESSIBLE" /> Accessible</label>
+                    <label class="check"><input type="checkbox" value="KIDS_NEAR" /> Near playground</label>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button id="refreshBtn">Refresh</button>
+                <button class="secondary" id="recommendBtn">Recommend</button>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="chip"><span class="dot free"></span> Free</div>
+            <div class="chip"><span class="dot occupied"></span> Occupied</div>
+            <div class="chip"><span class="dot unsuitable"></span> Too small</div>
+            <div class="chip"><span class="dot recommended"></span> Recommended</div>
+        </div>
+    </section>
+
+    <section class="content">
+        <div class="floor">
+            <div class="floor-header">
+                <h2>Floor</h2>
+                <div class="muted" id="summary">—</div>
+            </div>
+
+            <div id="floorGrid" class="floor-grid"></div>
+        </div>
+
+        <aside class="side">
+            <h2>Recommendation</h2>
+            <div id="recommendationBox" class="card">
+                <div class="muted">Press “Recommend”</div>
+            </div>
+
+            <h2>Top candidates</h2>
+            <div id="topCandidates" class="card list"></div>
+        </aside>
+    </section>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
