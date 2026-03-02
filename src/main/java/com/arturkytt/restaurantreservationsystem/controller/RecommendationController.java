@@ -13,6 +13,12 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
 
+/**
+ * REST controller providing table recommendation endpoints.
+ *
+ * Exposes an endpoint that returns the best available table
+ * based on time, party size and optional preferences.
+ */
 @RestController
 @RequestMapping("/api")
 public class RecommendationController {
@@ -22,7 +28,16 @@ public class RecommendationController {
     public RecommendationController(RecommendationService recommendationService) {
         this.recommendationService = recommendationService;
     }
-
+    /**
+     * Returns a recommendation result for the given criteria.
+     *
+     * @param date reservation date
+     * @param time reservation start time
+     * @param partySize number of guests
+     * @param zone optional zone restriction
+     * @param features optional comma-separated list of requested features
+     * @return recommendation response containing the best table and top candidates
+     */
     @GetMapping("/recommendation")
     public RecommendationResponseDto recommend(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
@@ -34,7 +49,12 @@ public class RecommendationController {
         Set<Feature> requested = parseFeatures(features);
         return recommendationService.recommend(date, time, partySize, zone, requested);
     }
-
+    /**
+     * Parses a comma-separated feature list into a set of Feature enums.
+     *
+     * @param features comma-separated feature names
+     * @return parsed feature set, or an empty set if none provided
+     */
     private Set<Feature> parseFeatures(String features) {
         if (features == null || features.isBlank()) {
             return EnumSet.noneOf(Feature.class);

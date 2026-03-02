@@ -6,7 +6,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Comparator;
 import java.util.List;
-
+/**
+ * REST controller providing endpoints for retrieving table information.
+ *
+ * Returns static table data without availability or scoring logic.
+ */
 @RestController
 @RequestMapping("/api")
 public class TableController {
@@ -16,7 +20,11 @@ public class TableController {
     public TableController(DiningTableRepository tableRepository) {
         this.tableRepository = tableRepository;
     }
-
+    /**
+     * Returns all dining tables sorted by table code.
+     *
+     * @return list of tables
+     */
     @GetMapping("/tables")
     public List<TableDto> getTables() {
         return tableRepository.findAll().stream()

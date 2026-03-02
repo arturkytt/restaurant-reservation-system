@@ -3,6 +3,19 @@ package com.arturkytt.restaurantreservationsystem.domain;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Entity representing a reservation made for a specific dining table.
+ *
+ * This class models the time interval during which a table is reserved
+ * and the number of guests included in the reservation.
+ *
+ * Business rules enforced in the service layer:
+ * - Reservations for the same table must not overlap in time.
+ * - Party size must not exceed the table capacity.
+ * - Start time must be before end time.
+ *
+ * This entity serves as a persistence model and does not contain validation logic.
+ */
 @Entity
 @Table(name = "reservation")
 public class Reservation {

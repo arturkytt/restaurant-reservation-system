@@ -15,6 +15,12 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service for retrieving dining table availability for a requested time slot.
+ *
+ * This service calculates the reservation time window using ReservationPolicy.DEFAULT_DURATION,
+ * finds overlapping reservations and returns per-table availability and suitability information.
+ */
 @Service
 public class AvailabilityService {
 
@@ -27,12 +33,18 @@ public class AvailabilityService {
     }
 
     /**
-     * Returns availability information for all dining tables for a given date and time.
-     * @param date the reservation date
-     * @param time the reservation start time
-     * @param partySize number of guests for the reservation
-     * @param zone optional zone filter; if {@code null}, all zones are included
-     * @return list of {@link TableAvailabilityDto}
+     * Returns availability information for all dining tables for the given date and start time.
+     *
+     * A table is marked as occupied if it has any reservation overlapping the requested time window.
+     * A table is marked as suitable if its capacity is greater than or equal to the requested party size.
+     *
+     * If zone is provided, only tables in that zone are included.
+     *
+     * @param date reservation date
+     * @param time reservation start time
+     * @param partySize number of guests
+     * @param zone optional zone filter; if null, all zones are included
+     * @return list of availability results for each table
      */
     public List<TableAvailabilityDto> getAvailability(LocalDate date, LocalTime time, int partySize, Zone zone) {
         LocalDateTime startTime = LocalDateTime.of(date, time);

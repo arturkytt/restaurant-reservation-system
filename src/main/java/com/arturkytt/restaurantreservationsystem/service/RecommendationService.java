@@ -17,6 +17,17 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service that recommends the best available table based on availability and preferences.
+ *
+ * The service:
+ * - excludes occupied tables based on overlapping reservations in the requested time window
+ * - excludes tables with insufficient capacity
+ * - optionally filters by zone
+ * - scores the remaining candidates and selects the highest scoring table
+ *
+ * If no candidates are available, the recommended table is null.
+ */
 @Service
 public class RecommendationService {
 
@@ -29,13 +40,14 @@ public class RecommendationService {
     }
 
     /**
-     * Recommends the best available table for the given time slot and requirements.
-     * Rules:
-     * 1) Exclude occupied tables (overlappreservations in the requested time windowing ).
-     * 2) Exclude tables with insufficient capacity.
-     * 3) If zone is provided, only consider tables in that zone.
-     * 4) Score remaining candidates and pick the highest score.
-     * Returns null recommended table if no candidates are available.
+     * Returns a recommendation result for the given time slot and requirements.
+     *
+     * @param date reservation date
+     * @param time reservation start time
+     * @param partySize number of guests
+     * @param zone optional zone restriction; if null, all zones are considered
+     * @param requestedFeatures optional feature preferences used in scoring
+     * @return recommendation response containing the best table (or null) and the top candidates
      */
     public RecommendationResponseDto recommend(
             LocalDate date,
@@ -80,11 +92,18 @@ public class RecommendationService {
     }
 
     /**
-     * Computes a score for a candidate table.
-     * Current scoring:
-     * - Capacity fit: prefer minimal unused seats (waste).
-     * - Zone match bonus (if requested).
-     * - Feature match: +10 per matched feature.
+     * Computes a recommendation score for a single candidate table.
+     *
+     * Scoring rules:
+     * - capacity fit: prefer minimal unused seats
+     * - zone bonus when a zone is requested and matches
+     * - feature match bonus for each requested feature present on the table
+     *
+     * @param t candidate table
+     * @param partySize requested number of guests
+     * @param requestedZone requested zone (may be null)
+     * @param requestedFeatures requested features (may be null or empty)
+     * @return DTO containing table details and the calculated score
      */
     private RecommendationCandidateDto toScoredDto(DiningTable t, int partySize, Zone requestedZone, Set<Feature> requestedFeatures) {
         int score = 0;

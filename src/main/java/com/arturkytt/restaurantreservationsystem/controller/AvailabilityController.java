@@ -10,6 +10,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+/**
+ * REST controller providing table availability endpoints.
+ *
+ * Exposes an endpoint for retrieving availability and suitability
+ * information for all tables for a specific date and time.
+ */
 @RestController
 @RequestMapping("/api")
 public class AvailabilityController {
@@ -20,6 +26,15 @@ public class AvailabilityController {
         this.availabilityService = availabilityService;
     }
 
+    /**
+     * Returns availability information for all tables for the given time slot.
+     *
+     * @param date reservation date
+     * @param time reservation start time
+     * @param partySize number of guests
+     * @param zone optional zone filter; if not provided, all zones are included
+     * @return list of table availability results
+     */
     @GetMapping("/availability")
     public List<TableAvailabilityDto> availability(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,

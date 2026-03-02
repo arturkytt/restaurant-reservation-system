@@ -5,6 +5,12 @@ import com.arturkytt.restaurantreservationsystem.domain.Zone;
 
 import java.util.Set;
 
+/**
+ * DTO representing a dining table without availability or scoring information.
+ *
+ * This object is typically used for general table listing endpoints
+ * where only static table information is required.
+ */
 public record TableDto(
         Long id,
         String code,

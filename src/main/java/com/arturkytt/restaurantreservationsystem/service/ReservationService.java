@@ -11,6 +11,16 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service responsible for creating reservations and enforcing core reservation rules.
+ *
+ * This service validates:
+ * - the table exists
+ * - party size does not exceed table capacity
+ * - the table is not already reserved during the requested time window
+ *
+ * The reservation end time is derived using ReservationPolicy.DEFAULT_DURATION.
+ */
 @Service
 public class ReservationService {
 
@@ -23,6 +33,13 @@ public class ReservationService {
         this.reservationRepository = reservationRepository;
     }
 
+    /**
+     * Creates a new reservation based on the provided request.
+     *
+     * @param request client request containing table id, start date/time and party size
+     * @throws IllegalArgumentException if the table does not exist or party size exceeds capacity
+     * @throws IllegalStateException if the table is already reserved for the requested time window
+     */
     public void createReservation(CreateReservationRequestDto request) {
 
         DiningTable table = tableRepository.findById(request.tableId())

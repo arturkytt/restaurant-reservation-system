@@ -4,6 +4,21 @@ import jakarta.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entity representing a physical dining table in the restaurant.
+ *
+ * This class belongs to the domain layer and defines the core properties
+ * of a table used in reservations, availability checks and recommendation logic.
+ *
+ * Business meaning of fields:
+ * - code is a human-readable unique identifier (for example "T1").
+ * - capacity defines the maximum number of guests the table can accommodate.
+ * - zone specifies the physical area of the restaurant where the table is located.
+ * - x and y represent table coordinates used for layout visualization or positioning logic.
+ * - features define special characteristics that may be used in filtering or recommendation scoring.
+ *
+ * This entity does not contain business logic. Validation and rules are handled in the service layer.
+ */
 @Entity
 @Table(name = "dining_table")
 public class DiningTable {
@@ -13,7 +28,7 @@ public class DiningTable {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String code; // e.g. "T1"
+    private String code;
 
     @Column(nullable = false)
     private int capacity;
@@ -86,6 +101,7 @@ public class DiningTable {
     public void setY(int y) {
         this.y = y;
     }
+
 
     public Set<Feature> getFeatures() {
         return features;

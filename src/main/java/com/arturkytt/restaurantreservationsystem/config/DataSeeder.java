@@ -14,13 +14,25 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Random;
 
-/*
-Reservations are generated deterministically using Random(42)
-Assumption: each reservation lasts 2 hours
-*/
+/**
+ * Seeds the database with initial demo data on application startup.
+ *
+ * Reservations are generated deterministically using Random(42) to make the dataset reproducible.
+ * The seeder creates a fixed set of dining tables and then generates 0-2 reservations
+ * per table per day for a 7-day period starting from the current date.
+ *
+ * Reservation duration is currently assumed to be 2 hours.
+ */
 @Configuration
 public class DataSeeder {
 
+    /**
+     * Seeds dining tables and reservations if the database is empty.
+     *
+     * @param tableRepo repository used to persist dining tables
+     * @param reservationRepo repository used to persist reservations
+     * @return a CommandLineRunner that performs the seeding
+     */
     @Bean
     CommandLineRunner seedData(DiningTableRepository tableRepo, ReservationRepository reservationRepo) {
         return args -> {
@@ -61,7 +73,7 @@ public class DataSeeder {
                     for (int i = 0; i < count; i++) {
                         LocalTime start = LocalTime.of(12 + rnd.nextInt(8), 0); // 12:00..19:00
                         LocalDateTime startTime = LocalDateTime.of(date, start);
-                        LocalDateTime endTime = startTime.plusHours(2);
+                        LocalDateTime endTime = startTime.plus(ReservationPolicy.DEFAULT_DURATION);
 
                         int partySize = Math.min(table.getCapacity(), 1 + rnd.nextInt(table.getCapacity()));
 
@@ -78,7 +90,17 @@ public class DataSeeder {
         };
     }
 
-
+    /**
+     * Factory method for creating a DiningTable instance used by the seeder.
+     *
+     * @param code table code (e.g. "T1")
+     * @param capacity maximum number of guests
+     * @param zone restaurant zone where the table is located
+     * @param x layout X coordinate
+     * @param y layout Y coordinate
+     * @param features set of table features
+     * @return initialized DiningTable instance
+     */
     private DiningTable createTable(String code, int capacity, Zone zone, int x, int y, EnumSet<Feature> features) {
         DiningTable t = new DiningTable();
         t.setCode(code);
