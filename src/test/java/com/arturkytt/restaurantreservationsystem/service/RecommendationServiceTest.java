@@ -15,19 +15,31 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
+/**
+ * Unit tests for RecommendationService.
+ *
+ * These tests verify that the recommendation logic:
+ * - prefers the best capacity fit
+ * - ignores occupied tables
+ * - applies feature preferences when scoring candidates
+ */
 class RecommendationServiceTest {
 
     private DiningTableRepository tableRepository;
     private ReservationRepository reservationRepository;
     private RecommendationService recommendationService;
-
+    /**
+     * Initializes the service with mocked repositories before each test.
+     */
     @BeforeEach
     void setup() {
         tableRepository = mock(DiningTableRepository.class);
         reservationRepository = mock(ReservationRepository.class);
         recommendationService = new RecommendationService(tableRepository, reservationRepository);
     }
-
+    /**
+     * Verifies that the service prefers the smallest suitable table when multiple candidates are available.
+     */
     @Test
     void shouldRecommendBestCapacityFit() {
         DiningTable t1 = table(1L, "T1", 2, Zone.MAIN_HALL, 1, 1, Set.of());
@@ -47,7 +59,9 @@ class RecommendationServiceTest {
         assertThat(resp.recommended()).isNotNull();
         assertThat(resp.recommended().code()).isEqualTo("T1");
     }
-
+    /**
+     * Verifies that occupied tables are excluded from the candidate list.
+     */
     @Test
     void shouldIgnoreOccupiedTables() {
         DiningTable t1 = table(1L, "T1", 2, Zone.MAIN_HALL, 1, 1, Set.of());
@@ -73,7 +87,9 @@ class RecommendationServiceTest {
         assertThat(resp.recommended()).isNotNull();
         assertThat(resp.recommended().code()).isEqualTo("T2");
     }
-
+    /**
+     * Verifies that requested features influence the score and may change which table is recommended.
+     */
     @Test
     void shouldPreferFeatureMatch() {
         DiningTable w = table(1L, "W1", 4, Zone.MAIN_HALL, 1, 1, Set.of(Feature.WINDOW));
@@ -93,7 +109,9 @@ class RecommendationServiceTest {
         assertThat(resp.recommended()).isNotNull();
         assertThat(resp.recommended().code()).isEqualTo("W1");
     }
-
+    /**
+     * Test helper for building DiningTable instances with the required attributes.
+     */
     private DiningTable table(Long id, String code, int capacity, Zone zone, int x, int y, Set<Feature> features) {
         DiningTable t = new DiningTable();
         t.setId(id);
