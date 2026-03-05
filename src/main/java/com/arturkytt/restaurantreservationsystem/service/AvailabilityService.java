@@ -38,7 +38,8 @@ public class AvailabilityService {
      * A table is marked as occupied if it has any reservation overlapping the requested time window.
      * A table is marked as suitable if its capacity is greater than or equal to the requested party size.
      *
-     * If zone is provided, only tables in that zone are included.
+     * Zone is used by the recommendation service, but the availability endpoint
+     * returns all tables so the floor plan can display full status information.
      *
      * @param date reservation date
      * @param time reservation start time
@@ -62,7 +63,6 @@ public class AvailabilityService {
         List<DiningTable> tables = tableRepository.findAll();
 
         return tables.stream()
-                .filter(t -> zone == null || t.getZone() == zone)
                 .map(t -> {
                     boolean occupied = occupiedTableIds.contains(t.getId());
                     boolean suitable = t.getCapacity() >= partySize;

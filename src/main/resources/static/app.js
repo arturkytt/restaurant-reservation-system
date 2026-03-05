@@ -24,6 +24,8 @@ let tables = [];
 let availability = [];
 let recommendedId = null;
 
+let refreshTimeout;
+
 function todayISO() {
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -299,6 +301,23 @@ function init() {
         recommendedId = null;
         await refreshAll();
         await recommend();
+    });
+
+    partySizeInput.addEventListener("input", () => {
+
+        partySizeInput.value = Math.max(1, partySizeInput.value);
+
+        clearTimeout(refreshTimeout);
+
+        refreshTimeout = setTimeout(async () => {
+            recommendedId = null;
+            await refreshAll();
+        }, 300);
+    });
+
+    zoneSelect.addEventListener("change", async () => {
+        recommendedId = null;
+        await refreshAll();
     });
 
     refreshAll();
